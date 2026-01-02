@@ -17,7 +17,6 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.player.Player
-import org.apache.commons.io.filefilter.FalseFileFilter
 
 object Highlight2 : Module(
     name = "Better Highlight",
@@ -60,7 +59,7 @@ object Highlight2 : Module(
         when (entity) {
             is ArmorStand -> false
             is WitherBoss -> false
-            is Player -> entity.uuid.version() != 2
+            is Player -> entity.uuid.version() == 2 && entity != mc.player
             else -> entity is LivingEntity
         }
 }
