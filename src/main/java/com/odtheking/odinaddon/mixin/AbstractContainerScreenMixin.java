@@ -15,6 +15,7 @@ public class AbstractContainerScreenMixin {
 
     @Inject(method = "slotClicked", at = @At("HEAD"), cancellable = true)
     private void preClick(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci) {
+        if (slot == null) return;
         if (new SlotInteractEvent((Screen) (Object) this, slotId, button, actionType).postAndCatch()) ci.cancel();
     }
 }
