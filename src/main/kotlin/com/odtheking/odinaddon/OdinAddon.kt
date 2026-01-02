@@ -17,7 +17,6 @@ import com.odtheking.odinaddon.features.impl.skyblock.BowPullback
 import com.odtheking.odinaddon.features.impl.skyblock.Click
 import com.odtheking.odinaddon.features.impl.skyblock.Highlight2
 import com.odtheking.odinaddon.features.impl.skyblock.ProtectItem
-import com.odtheking.odinaddon.features.impl.skyblock.TestModule
 import com.odtheking.odinaddon.features.impl.skyblock.event.CustomEventDispatcher
 import com.odtheking.odinaddon.utils.EntityCache
 import net.fabricmc.api.ClientModInitializer
@@ -38,7 +37,7 @@ object OdinAddon : ClientModInitializer {
 
         // Register modules by adding to the function
         addModules(
-            BowPullback,TestModule, Click, WitherHighlight, MimicChestHighlight, Highlight2, ProtectItem, Secrets,
+            BowPullback, ItemRarity, Click, WitherHighlight, MimicChestHighlight, Highlight2, ProtectItem, Secrets,
             Animations)
     }
 
