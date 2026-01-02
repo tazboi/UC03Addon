@@ -1,6 +1,6 @@
 # UC03 Addon
 
-This is a project made using OdinAddon, which allows adding of modules to [OdinFabric](https://github.com/odtheking/OdinFabric) using an external JAR.
+This is a project made using [OdinAddon](https://github.com/odtheking/OdinAddon), which allows adding of modules to [OdinFabric](https://github.com/odtheking/OdinFabric) using an external JAR.
 
 ## Dependencies
 
