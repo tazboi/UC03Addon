@@ -11,12 +11,15 @@ import com.odtheking.odin.events.core.CancellableEvent
 import com.odtheking.odin.features.Module
 import com.odtheking.odin.events.core.on
 import com.odtheking.odin.utils.equalsOneOf
+import com.odtheking.odin.utils.itemId
+import com.odtheking.odin.utils.modMessage
 import com.odtheking.odinaddon.features.impl.skyblock.event.KeyboardEvent
 import com.odtheking.odinaddon.features.impl.skyblock.event.MouseEvent
 import net.minecraft.client.KeyMapping
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket
 import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
+import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW
 
 object Click : Module(
@@ -29,6 +32,11 @@ object Click : Module(
         "Use LC",
         GLFW.GLFW_KEY_UNKNOWN,
         desc = "Keybind to Use"
+    ).withDependency { lcEnabled }
+    private val termOnly by BooleanSetting(
+        "Terminator Only",
+        false,
+        desc = "Left clicks automatically only while using terminator."
     ).withDependency { lcEnabled }
     private val leftCps by NumberSetting(
         "Left Clicks per Second",
@@ -59,6 +67,7 @@ object Click : Module(
         desc = "Number of clicks per second"
     ).withDependency { rcEnabled }
 
+
     private var nextLeftClick = .0
     private var nextRightClick = .0
 
@@ -72,25 +81,30 @@ object Click : Module(
             val nowMillis = System.currentTimeMillis()
             if (mc.screen != null || (!rcEnabled && !lcEnabled)) return@on;
             if (rcEnabled) tryRightClick(nowMillis)
-            if (lcEnabled) tryLeftClick(nowMillis)
+            if (lcEnabled) tryLeftClick(nowMillis, termOnly)
         }
 
         on<MouseEvent.Click> {
-            handleInputEvent(this, button);
+            handleInputEvent(this, button, termOnly);
         }
 
         on<KeyboardEvent> {
-            handleInputEvent(this, button.value);
+            handleInputEvent(this, button.value, termOnly);
         }
     }
 
-    private fun tryLeftClick(now: Long) {
-        if ((!lcUse.isDown && lcHold) || (!lcHold && !lastLCState)) return;
+    private fun tryLeftClick(now: Long, termOnly: Boolean = false) {
+        if (!termOnly) {
+            if ((!lcUse.isDown && lcHold) || (!lcHold && !lastLCState)) return;
+        } else if (!(mc.player?.mainHandItem?.itemId == "TERMINATOR" && (mc.options.keyUse as KeyMappingAccessor).boundKey.isDown)) return
+
         if (now < nextLeftClick) return;
+
         val key = (mc.options.keyAttack as KeyMappingAccessor).boundKey;
         nextLeftClick =
             now + ((1000 / leftCps) + ((Math.random() - .5) * 60.0)) + 4 //System.currentMillis() + (1s/cps + random 0-1s - 0.5s * 60s) + 4ms
         KeyMapping.click(key);
+
     }
 
     private fun tryRightClick(now: Long) {
@@ -102,11 +116,12 @@ object Click : Module(
         KeyMapping.click(key);
     }
 
-    private fun handleInputEvent(event: CancellableEvent, button: Int) {
+    private fun handleInputEvent(event: CancellableEvent, button: Int, termOnly: Boolean) {
         val left = (mc.options.keyAttack as KeyMappingAccessor).boundKey.value
         val right = (mc.options.keyUse as KeyMappingAccessor).boundKey.value
+        val shouldTerm = mc.player?.mainHandItem?.itemId == "TERMINATOR" && (mc.options.keyUse as KeyMappingAccessor).boundKey.isDown
 
-        val lcActive = lcEnabled && ((lcHold && lcUse.isDown) || (!lcHold && lastLCState))
+        val lcActive = if (termOnly) shouldTerm else lcEnabled && ((lcHold && lcUse.isDown) || (!lcHold && lastLCState))
         val rcActive = rcEnabled && ((rcHold && rcUse.isDown) || (!rcHold && lastRCState))
 
         when (button) {
