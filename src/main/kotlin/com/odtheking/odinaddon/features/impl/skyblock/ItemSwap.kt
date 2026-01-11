@@ -67,7 +67,7 @@ object ItemSwap: Module(
             val exists = mc.player?.inventory?.find { it.matchesSwapItem(swapMap[toSwap] ?: return@on) }
             val index = mc.player?.inventory?.indexOf(exists).takeIf { it in 0..9 } ?: return@on
 
-            scheduleSwap(index, 2)
+            scheduleSwap(index, delay)
         }
     }
 
