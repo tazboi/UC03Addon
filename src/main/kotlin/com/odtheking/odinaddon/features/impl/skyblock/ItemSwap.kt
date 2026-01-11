@@ -32,7 +32,7 @@ object ItemSwap: Module(
 
     init {
         on<GuiEvent.KeyPress> {
-            if (screen !is InventoryScreen || keyCode != setItemPairKeybind.value) return@on
+            if (screen !is InventoryScreen || input.key != setItemPairKeybind.value) return@on
             val item = (screen as AbstractContainerScreenAccessor).hoveredSlot?.item ?: return@on
 
             cancel()

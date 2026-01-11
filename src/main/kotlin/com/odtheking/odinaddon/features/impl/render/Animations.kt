@@ -32,7 +32,7 @@ object Animations : Module (
     val speed by NumberSetting("Speed Reduction", 6, 0, 100, 1, desc = "% speed reduction of the swing animation. 0 = no swing").withDependency { ignoreHaste }
     val stopFullSwing by BooleanSetting("Stop Arm Swing", false, desc = "Stops entire player arm from swinging.")
 
-    fun hookItemTransform(matrix: PoseStack, equipProgress: Float, swingProgress: Float){
+    fun hookItemTransform(matrix: PoseStack){
         if (!enabled) return
 
         matrix.apply {

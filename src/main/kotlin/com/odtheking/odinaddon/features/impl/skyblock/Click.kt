@@ -137,9 +137,9 @@ object Click : Module(
     val InputConstants.Key.isDown: Boolean
         get() {
             val v = this.value;
-            val mouse = if (v in 0..7) GLFW.glfwGetMouseButton(mc.window.window, v) else -1;
+            val mouse = if (v in 0..7) GLFW.glfwGetMouseButton(mc.window.handle(), v) else -1;
             val key =
-                if (v >= GLFW.GLFW_KEY_SPACE && v <= GLFW.GLFW_KEY_LAST) GLFW.glfwGetKey(mc.window.window, v) else -1;
+                if (v >= GLFW.GLFW_KEY_SPACE && v <= GLFW.GLFW_KEY_LAST) GLFW.glfwGetKey(mc.window.handle(), v) else -1;
 
             return 1.equalsOneOf(mouse, key);
         }

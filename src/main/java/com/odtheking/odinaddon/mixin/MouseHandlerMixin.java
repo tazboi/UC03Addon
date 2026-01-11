@@ -6,6 +6,8 @@ import com.odtheking.odin.OdinMod;
 import com.odtheking.odinaddon.features.impl.skyblock.event.MouseEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -18,10 +20,10 @@ import static com.odtheking.odin.utils.ChatUtilsKt.modMessage;
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
 
-    @Inject(method = "onPress", at = @At("HEAD"), cancellable = true)
-    private void prePress(long window, int button, int action, int modifier, CallbackInfo ci) {
+    @Inject(method = "onButton", at = @At("HEAD"), cancellable = true)
+    private void prePress(long window, MouseButtonInfo mouseButtonInfo, int action, CallbackInfo ci) {
         if (Minecraft.getInstance().screen != null) return;
-        fireEvent(button, action, modifier, ci);
+        fireEvent(mouseButtonInfo.button(), action, mouseButtonInfo.modifiers(), ci);
     }
 
     @Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)
@@ -31,7 +33,7 @@ public class MouseHandlerMixin {
 
     @Unique
     private static void fireEvent(int button, int action, int modifier, CallbackInfo ci) {
-        InputConstants.Key key = InputConstants.getKey(button, modifier);
+        InputConstants.Key key = InputConstants.Type.MOUSE.getOrCreate(button);
         if (action == 1) {
             if (new MouseEvent.Click(key.getValue()).postAndCatch()) ci.cancel();
         } else {

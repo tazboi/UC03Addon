@@ -15,7 +15,7 @@ public class KeyMappingMixin {
     @Shadow
     private boolean isDown;
     @Shadow
-    private InputConstants.Key key;
+    protected InputConstants.Key key;
 
     @Inject(
             method = "setDown",

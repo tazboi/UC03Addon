@@ -41,11 +41,11 @@ object Highlight2 : Module(
     )
 
     init {
-        on<RenderEvent.Last> {
+        on<RenderEvent.Extract> {
             highlightCollection.forEach { entity ->
                 if (!entity.isAlive || entity.isRemoved) return@forEach
                 val colorkey = highlightMap.keys.find { entity.customName?.string?.lowercase()?.contains(it) ?: false } ?: defaultColor
-                context.drawStyledBox(
+                drawStyledBox(
                     entity.renderBoundingBox,
                     highlightMap[colorkey] ?: defaultColor,
                     renderStyle,

@@ -50,13 +50,13 @@ object WitherHighlight : Module(
 
     init {
 
-        on<RenderEvent.Last> {
+        on<RenderEvent.Extract> {
             if (!DungeonUtils.inDungeons || !DungeonUtils.inBoss) return@on;
 
             witherEntities.forEach { wither ->
                 if (!wither.isAlive) return@forEach;
 
-                context.drawStyledBox(
+                drawStyledBox(
                     wither.renderBoundingBox,
                     color.multiplyAlpha(0.5f),
                     renderStyle,
@@ -65,7 +65,7 @@ object WitherHighlight : Module(
             }
 
             if (witherEntities.size == 0) {
-                context.drawStyledBox(
+                drawStyledBox(
                     lastWitherParticles ?: return@on, color.multiplyAlpha(0.5f),
                     renderStyle, depth = true
                 )

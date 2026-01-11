@@ -52,11 +52,11 @@ object MimicChestHighlight : Module(
     val mimic = EntityCollection({ it is Zombie && it.isBaby })
 
     init {
-        on<RenderEvent.Last> {
+        on<RenderEvent.Extract> {
             if (!DungeonUtils.inDungeons || DungeonUtils.inBoss) return@on
             currBlock?.let {
                 if (roomName != DungeonUtils.currentRoom?.data?.name) return@let
-                context.drawStyledBox(
+                drawStyledBox(
                     AABB(it),
                     chestColor.multiplyAlpha(0.5f),
                     renderStyle,
@@ -65,7 +65,7 @@ object MimicChestHighlight : Module(
             }
 
             mimic.firstOrNull()?.let {
-                context.drawStyledBox(
+                drawStyledBox(
                     it.renderBoundingBox,
                     hlColor.multiplyAlpha(0.5f),
                     renderStyle,

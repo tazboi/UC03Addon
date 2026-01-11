@@ -7,6 +7,7 @@ import com.odtheking.odinaddon.features.impl.render.Animations;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -44,24 +45,16 @@ public abstract class ItemInHandRendererMixin {
             method = "renderArmWithItem",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;" +
-                            "renderItem(" +
-                            "Lnet/minecraft/world/entity/LivingEntity;" +
-                            "Lnet/minecraft/world/item/ItemStack;" +
-                            "Lnet/minecraft/world/item/ItemDisplayContext;" +
-                            "Lcom/mojang/blaze3d/vertex/PoseStack;" +
-                            "Lnet/minecraft/client/renderer/MultiBufferSource;" +
-                            "I" +
-                            ")V"
+                    target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V"
             )
     )
-    private void preRender(AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand interactionHand, float swingProgress, ItemStack itemStack, float equipProgress, PoseStack poseStack, MultiBufferSource multiBufferSource, int light, CallbackInfo ci) {
-        if (interactionHand == InteractionHand.MAIN_HAND) Animations.INSTANCE.hookItemTransform(poseStack, equipProgress, swingProgress);
+    private void preRender(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int j, CallbackInfo ci) {
+        if (interactionHand == InteractionHand.MAIN_HAND) Animations.INSTANCE.hookItemTransform(poseStack);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void postTick(CallbackInfo ci) {
-        if (Animations.INSTANCE.getStopEquipAnimation()) {
+        if (Animations.INSTANCE.getEnabled() && Animations.INSTANCE.getStopEquipAnimation()) {
             this.oMainHandHeight = 1.0f;
             this.mainHandHeight = 1.0f;
             this.oOffHandHeight = 1.0f;
@@ -77,13 +70,13 @@ public abstract class ItemInHandRendererMixin {
             )
     )
     private float overrideAttackStrengthScale(float originalValue) {
-        if (Animations.INSTANCE.getStopEquipAnimation() || Animations.INSTANCE.getStopFullSwing()) return 1f;
+        if (Animations.INSTANCE.getEnabled() && Animations.INSTANCE.getStopEquipAnimation() || Animations.INSTANCE.getStopFullSwing()) return 1f;
         return originalValue;
     }
 
     @Inject(method = "swingArm", at = @At("HEAD"), cancellable = true)
     private void stopSwing(float swingProgress, float equipProgress, PoseStack poseStack, int swingTicks, HumanoidArm arm, CallbackInfo ci) {
-        if (!Animations.INSTANCE.getStopFullSwing()) return;
+        if (Animations.INSTANCE.getEnabled() && !Animations.INSTANCE.getStopFullSwing()) return;
         ci.cancel();
         this.applyItemArmTransform(poseStack, arm, equipProgress);
         this.applyItemArmAttackTransform(poseStack, arm, swingProgress);
@@ -91,7 +84,7 @@ public abstract class ItemInHandRendererMixin {
 
     @Inject(method = "shouldInstantlyReplaceVisibleItem", at = @At("HEAD"), cancellable = true)
     private void forceInstantlyReplace(ItemStack itemStack, ItemStack itemStack2, CallbackInfoReturnable<Boolean> cir) {
-        if (Animations.INSTANCE.getStopEquipAnimation()) cir.setReturnValue(true);
+        if (Animations.INSTANCE.getEnabled() && Animations.INSTANCE.getStopEquipAnimation()) cir.setReturnValue(true);
     }
 
 }
