@@ -40,7 +40,7 @@ object ItemSwap: Module(
             previousItem?.let { secondItem ->
                 if (item == secondItem) return@on modMessage("An item cannot be linked to itself.")
 
-                swapMap[ SwapItem(secondItem.displayName?.string, secondItem.itemId, secondItem.itemUUID)] =
+                swapMap[SwapItem(secondItem.displayName?.string, secondItem.itemId, secondItem.itemUUID)] =
                     SwapItem(item.displayName?.string, item.itemId, item.itemUUID)
 
                 ModuleManager.saveConfigurations()
@@ -65,7 +65,7 @@ object ItemSwap: Module(
             val held = mc.player?.mainHandItem ?: return@on
             val toSwap = swapMap.keys.firstOrNull { held.matchesSwapItem(it) } ?: return@on
             val exists = mc.player?.inventory?.find { it.matchesSwapItem(swapMap[toSwap] ?: return@on) }
-            val index = mc.player?.inventory?.indexOf(exists).takeIf { it in 0..9 } ?: return@on
+            val index = mc.player?.inventory?.indexOf(exists).takeIf { it in 0 until 9 } ?: return@on
 
             scheduleSwap(index, delay)
         }

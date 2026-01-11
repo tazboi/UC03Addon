@@ -26,6 +26,7 @@ import com.odtheking.odinaddon.features.impl.skyblock.ProtectItem
 import com.odtheking.odinaddon.features.impl.skyblock.TestModule
 import com.odtheking.odinaddon.features.impl.skyblock.event.CustomEventDispatcher
 import com.odtheking.odinaddon.utils.EntityCache
+import com.odtheking.odinaddon.utils.PlayerScheduler
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 
@@ -40,7 +41,7 @@ object OdinAddon : ClientModInitializer {
         }
 
         // Register objects to event bus by adding to the list
-        listOf(this, CustomEventDispatcher, EntityCache).forEach { EventBus.subscribe(it) }
+        listOf(this, CustomEventDispatcher, EntityCache, PlayerScheduler).forEach { EventBus.subscribe(it) }
 
         // Register modules by adding to the function
         ModuleManager.registerModules(
