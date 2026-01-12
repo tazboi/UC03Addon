@@ -52,6 +52,7 @@ public class LivingEntityMixin {
     private void preventClientSwing(InteractionHand interactionHand, boolean bl, CallbackInfo ci) {
                 Player player = Minecraft.getInstance().player;
                 if ((Object) this != player) return;
+                if (!Animations.INSTANCE.getEnabled() || !Animations.INSTANCE.getStopSwingSpam()) return;
 
                 if (this.swinging) ci.cancel();
     }
