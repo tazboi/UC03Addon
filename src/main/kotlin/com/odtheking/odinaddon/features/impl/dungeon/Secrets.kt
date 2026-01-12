@@ -10,12 +10,16 @@ import com.odtheking.odin.features.Module
 import com.odtheking.odin.features.impl.floor7.TerminalSolver.startsWithColor
 import com.odtheking.odin.utils.Colors
 import com.odtheking.odin.utils.equalsOneOf
+import com.odtheking.odin.utils.itemId
 import com.odtheking.odin.utils.modMessage
 import com.odtheking.odin.utils.render.textDim
 import com.odtheking.odin.utils.skyblock.dungeon.DungeonUtils
+import com.odtheking.odinaddon.features.impl.skyblock.event.PlayerInteractEvent
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
+import net.minecraft.world.level.block.ChestBlock
+import net.minecraft.world.level.block.TrappedChestBlock
 
 object Secrets : Module(
     name = "Secrets",
@@ -32,6 +36,12 @@ object Secrets : Module(
         listOf("Auto", "Input"),
         desc = "How to close the chest."
     ).withDependency { closeChest }
+
+    private val preventBreakChest by BooleanSetting(
+        name = "Prevent Chest Break",
+        false,
+        desc = "Prevents breaking chests with Dungeonbreaker."
+    )
 
     val SECRET_REGEX = Regex("§\\d+/\\d+\\sSecrets")
     private var currSecrets = ""
@@ -70,5 +80,10 @@ object Secrets : Module(
             mc.player?.closeContainer()
         }
 
+        on<PlayerInteractEvent.LEFT_CLICK.BLOCK> {
+            if (!preventBreakChest || !DungeonUtils.inDungeons || item?.itemId != "DUNGEONBREAKER") return@on
+            mc.level?.getBlockState(pos).takeIf { it?.block is ChestBlock || it?.block is TrappedChestBlock } ?: return@on
+            cancel()
+        }
     }
 }

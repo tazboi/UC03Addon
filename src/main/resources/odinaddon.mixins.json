@@ -25,6 +25,7 @@
     "KeyboardHandlerMixin",
     "KeyMappingMixin",
     "LocalPlayerMixin",
+    "MinecraftMixin",
     "MouseHandlerMixin",
     "ScreenEffectRendererMixin"
   ]
