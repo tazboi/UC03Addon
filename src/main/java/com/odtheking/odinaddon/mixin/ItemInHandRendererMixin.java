@@ -54,7 +54,8 @@ public abstract class ItemInHandRendererMixin {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void postTick(CallbackInfo ci) {
-        if (Animations.INSTANCE.getEnabled() && Animations.INSTANCE.getStopEquipAnimation()) {
+        if (!Animations.INSTANCE.getEnabled()) return;
+        if (Animations.INSTANCE.getStopEquipAnimation()) {
             this.oMainHandHeight = 1.0f;
             this.mainHandHeight = 1.0f;
             this.oOffHandHeight = 1.0f;
@@ -76,7 +77,7 @@ public abstract class ItemInHandRendererMixin {
 
     @Inject(method = "swingArm", at = @At("HEAD"), cancellable = true)
     private void stopSwing(float swingProgress, float equipProgress, PoseStack poseStack, int swingTicks, HumanoidArm arm, CallbackInfo ci) {
-        if (Animations.INSTANCE.getEnabled() && !Animations.INSTANCE.getStopFullSwing()) return;
+        if (!Animations.INSTANCE.getEnabled() || !Animations.INSTANCE.getStopFullSwing()) return;
         ci.cancel();
         this.applyItemArmTransform(poseStack, arm, equipProgress);
         this.applyItemArmAttackTransform(poseStack, arm, swingProgress);
@@ -84,7 +85,8 @@ public abstract class ItemInHandRendererMixin {
 
     @Inject(method = "shouldInstantlyReplaceVisibleItem", at = @At("HEAD"), cancellable = true)
     private void forceInstantlyReplace(ItemStack itemStack, ItemStack itemStack2, CallbackInfoReturnable<Boolean> cir) {
-        if (Animations.INSTANCE.getEnabled() && Animations.INSTANCE.getStopEquipAnimation()) cir.setReturnValue(true);
+        if (!Animations.INSTANCE.getEnabled()) return;
+        if (Animations.INSTANCE.getStopEquipAnimation()) cir.setReturnValue(true);
     }
 
 }

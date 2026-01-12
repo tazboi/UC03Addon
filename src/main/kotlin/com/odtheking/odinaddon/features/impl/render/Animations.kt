@@ -31,6 +31,7 @@ object Animations : Module (
     val ignoreHaste by BooleanSetting("Ignore Effects", false, desc = "Makes the chosen speed override haste modifiers.")
     val speed by NumberSetting("Speed Reduction", 6, 0, 100, 1, desc = "% speed reduction of the swing animation. 0 = no swing").withDependency { ignoreHaste }
     val stopFullSwing by BooleanSetting("Stop Arm Swing", false, desc = "Stops entire player arm from swinging.")
+    val stopSwingSpam by BooleanSetting("Stop Swing Spam", false, desc = "Stops spam swinging on spam clicks/block breaks.")
 
     fun hookItemTransform(matrix: PoseStack){
         if (!enabled) return
