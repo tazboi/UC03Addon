@@ -23,6 +23,7 @@
     "GuiMixin",
     "ItemInHandRendererMixin",
     "KeyboardHandlerMixin",
+    "KeyMappingAccessor",
     "KeyMappingMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",

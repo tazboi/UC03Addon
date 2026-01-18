@@ -1,7 +1,6 @@
 package com.odtheking.odinaddon.features.impl.skyblock
 
 import com.odtheking.mixin.accessors.AbstractContainerScreenAccessor
-import com.odtheking.mixin.accessors.KeyMappingAccessor
 import com.odtheking.odin.clickgui.settings.impl.KeybindSetting
 import com.odtheking.odin.clickgui.settings.impl.MapSetting
 import com.odtheking.odin.clickgui.settings.impl.NumberSetting
@@ -15,8 +14,10 @@ import com.odtheking.odin.utils.itemId
 import com.odtheking.odin.utils.itemUUID
 import com.odtheking.odin.utils.modMessage
 import com.odtheking.odinaddon.features.impl.skyblock.event.InputReleaseEvent
+import com.odtheking.odinaddon.mixin.KeyMappingAccessor
 import com.odtheking.odinaddon.utils.PlayerScheduler.scheduleSwap
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW
 
@@ -33,7 +34,7 @@ object ItemSwap: Module(
     init {
         on<GuiEvent.KeyPress> {
             if (screen !is InventoryScreen || input.key != setItemPairKeybind.value) return@on
-            val item = (screen as AbstractContainerScreenAccessor).hoveredSlot?.item ?: return@on
+            val item = (screen as AbstractContainerScreenAccessor).hoveredSlot?.item.takeUnless { it!!.isEmpty } ?: return@on
 
             cancel()
 
@@ -44,12 +45,23 @@ object ItemSwap: Module(
                     SwapItem(item.displayName?.string, item.itemId, item.itemUUID)
 
                 ModuleManager.saveConfigurations()
-                modMessage("${secondItem.displayName?.string} has been mapped to swap to  ${item.displayName?.string}")
+                modMessage(
+                    Component.empty()
+                        .append(secondItem.displayName)
+                        .append(Component.literal(" has been mapped to swap to "))
+                        .append(item.displayName)
+                )
+
+                previousItem = null
             } ?: run {
                 swapMap.keys.find { item.matchesSwapItem(it) }?.let {
                     swapMap.remove(it)
                     ModuleManager.saveConfigurations()
-                    return@on modMessage("${item.displayName?.string} has been removed from Item Swaps")
+                    return@on modMessage(
+                        Component.empty()
+                            .append(item.displayName)
+                            .append(Component.literal(" has been removed from Item Swaps."))
+                    )
                 }
 
                 previousItem = item
