@@ -27,7 +27,7 @@ object ItemSwap: Module(
 ) {
     private val setItemPairKeybind by KeybindSetting("Link New Swap Pair", GLFW.GLFW_KEY_UNKNOWN, desc = "Links one item to another to swap to.")
     private val delay by NumberSetting("Delay", 3, 1, 20, desc = "Delay in ticks before swapping to the other item")
-    private val swapMap = this.registerSetting(MapSetting("Item Swap Map", mutableMapOf<SwapItem, SwapItem>())).value
+    private val swapMap = this.registerSetting(MapSetting("Item Swap Map", mutableMapOf<String, SwapItem>())).value
 
     private var previousItem: ItemStack? = null
 
@@ -35,13 +35,13 @@ object ItemSwap: Module(
         on<GuiEvent.KeyPress> {
             if (screen !is InventoryScreen || input.key != setItemPairKeybind.value) return@on
             val item = (screen as AbstractContainerScreenAccessor).hoveredSlot?.item.takeUnless { it!!.isEmpty } ?: return@on
-
             cancel()
 
             previousItem?.let { secondItem ->
                 if (item == secondItem) return@on modMessage("An item cannot be linked to itself.")
 
-                swapMap[SwapItem(secondItem.displayName?.string, secondItem.itemId, secondItem.itemUUID)] =
+                val itemInfo = secondItem.itemUUID.validOrNull() ?: secondItem.itemId.validOrNull() ?: return@on modMessage("Please use an item that has a Skyblock ID or UUID.")
+                swapMap[itemInfo] =
                     SwapItem(item.displayName?.string, item.itemId, item.itemUUID)
 
                 ModuleManager.saveConfigurations()
@@ -54,7 +54,7 @@ object ItemSwap: Module(
 
                 previousItem = null
             } ?: run {
-                swapMap.keys.find { item.matchesSwapItem(it) }?.let {
+                swapMap.keys.find { item.itemId == it || item.itemUUID == it }?.let {
                     swapMap.remove(it)
                     ModuleManager.saveConfigurations()
                     return@on modMessage(
@@ -74,9 +74,10 @@ object ItemSwap: Module(
 
         on<InputReleaseEvent> {
             if (key != (mc.options.keyUse as KeyMappingAccessor).boundKey) return@on
-            val held = mc.player?.mainHandItem ?: return@on
-            val toSwap = swapMap.keys.firstOrNull { held.matchesSwapItem(it) } ?: return@on
-            val exists = mc.player?.inventory?.find { it.matchesSwapItem(swapMap[toSwap] ?: return@on) }
+            val held = mc.player?.mainHandItem?.let {
+                it.itemUUID.validOrNull() ?: it.itemId.validOrNull()
+            } ?: return@on
+            val exists = mc.player?.inventory?.find { it.matchesSwapItem(swapMap[held] ?: return@on) }
             val index = mc.player?.inventory?.indexOf(exists).takeIf { it in 0 until 9 } ?: return@on
 
             scheduleSwap(index, delay)
@@ -86,5 +87,8 @@ object ItemSwap: Module(
     fun ItemStack.matchesSwapItem(swapItem: SwapItem) : Boolean {
         return this.itemUUID == swapItem.uuid || this.itemId == swapItem.sbID || this.displayName?.string == swapItem.name
     }
+
+    fun String?.validOrNull() = takeUnless { it.isNullOrBlank() }
+
     data class SwapItem(val name: String?, val sbID: String, val uuid: String? = null)
 }
