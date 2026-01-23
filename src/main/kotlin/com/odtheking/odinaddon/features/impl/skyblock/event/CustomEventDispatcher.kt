@@ -4,6 +4,7 @@ import com.odtheking.odin.events.core.onReceive
 import com.odtheking.odin.utils.skyblock.dungeon.DungeonUtils
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 
 object CustomEventDispatcher {
@@ -23,6 +24,14 @@ object CustomEventDispatcher {
 
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, blockOutline ->
             !BlockOutlineEvent(context, blockOutline).postAndCatch()
+        }
+
+        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+            WorldEvent.Load().postAndCatch()
+        }
+
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
+            WorldEvent.Unload().postAndCatch()
         }
     }
 }

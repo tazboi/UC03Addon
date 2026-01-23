@@ -1,10 +1,10 @@
 package com.odtheking.odinaddon.utils
 
-import com.odtheking.odin.events.WorldLoadEvent
 import com.odtheking.odin.events.core.on
 import com.odtheking.odin.utils.handlers.schedule
 import com.odtheking.odin.utils.modMessage
 import com.odtheking.odinaddon.features.impl.skyblock.event.EntityWorldEvent
+import com.odtheking.odinaddon.features.impl.skyblock.event.WorldEvent
 
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -56,7 +56,7 @@ object EntityCache {
             }
         }
 
-        on<WorldLoadEvent> {
+        on<WorldEvent.Unload> {
             for (coll in cache) {
                 coll.clear()
             }
